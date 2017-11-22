@@ -8,7 +8,7 @@ To enable django-messages in your Django project make sure it is
 :ref:`installed <ref-messages-install>`. You can check if django-messages was
 successfully installed by opening a python shell and running::
 
-    >>> import django_messages
+    >>> import django_rest_messages
     >>>
 
 If no error occured, you can assume that the app was installed correctly.
@@ -17,11 +17,11 @@ If no error occured, you can assume that the app was installed correctly.
 Edit settings
 -------------
 
-The next step is to add ``django_messages`` to the ``INSTALLED_APPS`` setting::
+The next step is to add ``django_rest_messages`` to the ``INSTALLED_APPS`` setting::
 
     INSTALLED_APPS = (
         ...
-        'django_messages',
+        'django_rest_messages',
         ...
     )
 
@@ -35,7 +35,7 @@ your main ``urls.py`` and add a line like this::
 
     urlpatterns = patterns(''
         ...
-        (r'^messages/', include('django_messages.urls')),
+        (r'^messages/', include('django_rest_messages.urls')),
         ...
     )
 
@@ -78,7 +78,7 @@ TEMPLATE_CONTEXT_PROCESSORS settings in your settings.py::
 
     TEMPLATE_CONTEXT_PROCESSORS = (
         ...
-        'django_messages.context_processors.inbox',
+        'django_rest_messages.context_processors.inbox',
     )
 
 And now every Template Context will contain a variable named
@@ -94,4 +94,4 @@ If you do want to disable django-messages from sending either a
 'pinax-notifications' notice or an email (fallback if 'pinax-notifications
 not installed' then set the following in your django settings::
 
-    DJANGO_MESSAGES_NOTIFY = False
+    django_rest_messages_NOTIFY = False

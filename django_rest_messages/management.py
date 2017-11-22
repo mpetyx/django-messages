@@ -2,7 +2,7 @@ from django.db.models import signals
 from django.conf import settings
 from django.utils.translation import ugettext_noop as _
 
-if "pinax.notifications" in settings.INSTALLED_APPS and getattr(settings, 'DJANGO_MESSAGES_NOTIFY', True):
+if "pinax.notifications" in settings.INSTALLED_APPS and getattr(settings, 'django_rest_messages_NOTIFY', True):
     from pinax.notifications import models as notification
 
     def create_notice_types(app, created_models, verbosity, **kwargs):

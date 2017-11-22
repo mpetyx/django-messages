@@ -57,7 +57,7 @@ http://django-messages.readthedocs.org
 Install
 -------
 Download the tar archive, unpack and run python setup.py install or checkout
-the trunk and put the ``django_messages`` folder on your ``PYTHONPATH``.
+the trunk and put the ``django_rest_messages`` folder on your ``PYTHONPATH``.
 Released versions of django-messages are also available on pypi and can be
 installed with easy_install or pip.
 
@@ -65,8 +65,8 @@ installed with easy_install or pip.
 Usage
 -----
 
-Add ``django_messages`` to your ``INSTALLED_APPS`` setting and add an
-``include('django_messages.urls')`` at any point in your url-conf.
+Add ``django_rest_messages`` to your ``INSTALLED_APPS`` setting and add an
+``include('django_rest_messages.urls')`` at any point in your url-conf.
 
 The app includes some default templates, which are pretty simple. They
 extend a template called ``base.html`` and only emit stuff in the block

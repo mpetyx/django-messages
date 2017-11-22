@@ -58,7 +58,7 @@ Manual Install
 --------------
 
 Instead of using ``setup.py install`` it is also possible to copy or symlink
-the ``django_messages`` folder inside the toplevel ``django-messages`` folder 
+the ``django_rest_messages`` folder inside the toplevel ``django-messages`` folder
 to your Python path. This will be enough to make djano-messages available to 
 your system.
 

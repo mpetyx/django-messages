@@ -4,9 +4,9 @@ from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.contrib.auth.models import AnonymousUser
 from django.template import Template, Context
-from django_messages.models import Message
-from django_messages.utils import format_subject, format_quote
-from django_messages.context_processors import inbox
+from django_rest_messages.models import Message
+from django_rest_messages.utils import format_subject, format_quote
+from django_rest_messages.context_processors import inbox
 
 from .utils import get_user_model
 
@@ -94,7 +94,7 @@ class IntegrationTestCase(TestCase):
         response = self.c.get(reverse('messages_inbox'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.templates[0].name,
-                         'django_messages/inbox.html')
+                         'django_rest_messages/inbox.html')
         self.assertEqual(len(response.context['message_list']), 0)
 
     def testOutboxEmpty(self):
@@ -102,7 +102,7 @@ class IntegrationTestCase(TestCase):
         response = self.c.get(reverse('messages_outbox'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.templates[0].name,
-                         'django_messages/outbox.html')
+                         'django_rest_messages/outbox.html')
         self.assertEqual(len(response.context['message_list']), 0)
 
     def testTrashEmpty(self):
@@ -110,7 +110,7 @@ class IntegrationTestCase(TestCase):
         response = self.c.get(reverse('messages_trash'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.templates[0].name,
-                         'django_messages/trash.html')
+                         'django_rest_messages/trash.html')
         self.assertEqual(len(response.context['message_list']), 0)
 
     def testCompose(self):
@@ -118,7 +118,7 @@ class IntegrationTestCase(TestCase):
         response = self.c.get(reverse('messages_compose'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.templates[0].name,
-                         'django_messages/compose.html')
+                         'django_rest_messages/compose.html')
         response = self.c.post(
             reverse('messages_compose'),
             {
@@ -151,7 +151,7 @@ class IntegrationTestCase(TestCase):
         response = self.c.get(reverse('messages_inbox'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.templates[0].name,
-                         'django_messages/inbox.html')
+                         'django_rest_messages/inbox.html')
         self.assertEqual(len(response.context['message_list']), 1)
         pk = getattr(response.context['message_list'][0], 'pk')
         # reply to the first message
@@ -159,7 +159,7 @@ class IntegrationTestCase(TestCase):
                               kwargs={'message_id': pk}))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.templates[0].name,
-                         'django_messages/compose.html')
+                         'django_rest_messages/compose.html')
         self.assertEqual(
             response.context['form'].initial['body'],
             format_quote(self.user_1, self.T_MESSAGE_DATA[0]['body'])

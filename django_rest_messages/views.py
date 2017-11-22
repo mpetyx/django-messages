@@ -8,8 +8,8 @@ from django.utils import timezone
 from django.core.urlresolvers import reverse
 from django.conf import settings
 
-from django_messages.models import Message
-from django_messages.utils import format_quote, get_user_model, get_username_field
+from django_rest_messages.models import Message
+from django_rest_messages.utils import format_quote, get_user_model, get_username_field
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -19,7 +19,7 @@ User = get_user_model()
 
 @login_required
 @api_view(['GET'])
-def inbox(request, template_name='django_messages/inbox.html'):
+def inbox(request, template_name='django_rest_messages/inbox.html'):
     """
     Displays a list of received messages for the current user.
     Optional Arguments:
@@ -30,7 +30,7 @@ def inbox(request, template_name='django_messages/inbox.html'):
 
 @login_required
 @api_view(['GET'])
-def outbox(request, template_name='django_messages/outbox.html'):
+def outbox(request, template_name='django_rest_messages/outbox.html'):
     """
     Displays a list of sent messages by the current user.
     Optional arguments:
@@ -41,7 +41,7 @@ def outbox(request, template_name='django_messages/outbox.html'):
 
 @login_required
 @api_view(['GET'])
-def trash(request, template_name='django_messages/trash.html'):
+def trash(request, template_name='django_rest_messages/trash.html'):
     """
     Displays a list of deleted messages.
     Optional arguments:
@@ -54,7 +54,7 @@ def trash(request, template_name='django_messages/trash.html'):
 
 @login_required
 def compose(request, recipient=None,
-        template_name='django_messages/compose.html', success_url=None, recipient_filter=None):
+        template_name='django_rest_messages/compose.html', success_url=None, recipient_filter=None):
     """
     Displays and handles the ``form_class`` form to compose new messages.
     Required Arguments: None
@@ -88,7 +88,7 @@ def compose(request, recipient=None,
 
 @login_required
 def reply(request, message_id,
-        template_name='django_messages/compose.html', success_url=None,
+        template_name='django_rest_messages/compose.html', success_url=None,
         recipient_filter=None, quote_helper=format_quote,
         subject_template=_(u"Re: %(subject)s"),):
     """

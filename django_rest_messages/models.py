@@ -4,7 +4,7 @@ from django.db.models import signals
 from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
-from django_messages.utils import new_message_email
+from django_rest_messages.utils import new_message_email
 
 AUTH_USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 

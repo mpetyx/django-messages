@@ -2,7 +2,7 @@ from django.conf.urls import url, include
 from django.views.generic import RedirectView
 from api import router
 
-from django_messages.views import *
+from django_rest_messages.views import *
 
 urlpatterns = [
     url(r'^inbox/$', inbox, name='messages_inbox'),
