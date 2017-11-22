@@ -1,4 +1,3 @@
-import re
 import django
 from django.utils.text import wrap
 from django.utils.translation import ugettext, ugettext_lazy as _
@@ -26,34 +25,6 @@ def format_quote(sender, body):
     return ugettext(u"%(sender)s wrote:\n%(body)s") % {
         'sender': sender,
         'body': quote
-    }
-
-def format_subject(subject):
-    """
-    Prepends 'Re:' to the subject. To avoid multiple 'Re:'s
-    a counter is added.
-    NOTE: Currently unused. First step to fix Issue #48.
-    FIXME: Any hints how to make this i18n aware are very welcome.
-
-    """
-    subject_prefix_re = r'^Re\[(\d*)\]:\ '
-    m = re.match(subject_prefix_re, subject, re.U)
-    prefix = u""
-    if subject.startswith('Re: '):
-        prefix = u"[2]"
-        subject = subject[4:]
-    elif m is not None:
-        try:
-            num = int(m.group(1))
-            prefix = u"[%d]" % (num+1)
-            subject = subject[6+len(str(num)):]
-        except:
-            # if anything fails here, fall back to the old mechanism
-            pass
-
-    return ugettext(u"Re%(prefix)s: %(subject)s") % {
-        'subject': subject,
-        'prefix': prefix
     }
 
 def new_message_email(sender, instance, signal,

@@ -4,6 +4,7 @@ from django.db.models import signals
 from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
+from django_messages.utils import new_message_email
 
 AUTH_USER_MODEL = getattr(settings, 'AUTH_USER_MODEL', 'auth.User')
 
@@ -99,7 +100,5 @@ def inbox_count_for(user):
     """
     return Message.objects.filter(recipient=user, read_at__isnull=True, recipient_deleted_at__isnull=True).count()
 
-# fallback for email notification if django-notification could not be found
-if "pinax.notifications" not in settings.INSTALLED_APPS and getattr(settings, 'DJANGO_MESSAGES_NOTIFY', True):
-    from django_messages.utils import new_message_email
-    signals.post_save.connect(new_message_email, sender=Message)
+
+signals.post_save.connect(new_message_email, sender=Message)

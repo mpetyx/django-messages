@@ -9,17 +9,16 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 
 from django_messages.models import Message
-from django_messages.forms import ComposeForm
 from django_messages.utils import format_quote, get_user_model, get_username_field
+
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from api import MessageSerializer
 
 User = get_user_model()
 
-if "pinax.notifications" in settings.INSTALLED_APPS and getattr(settings, 'DJANGO_MESSAGES_NOTIFY', True):
-    from pinax.notifications import models as notification
-else:
-    notification = None
-
 @login_required
+@api_view(['GET'])
 def inbox(request, template_name='django_messages/inbox.html'):
     """
     Displays a list of received messages for the current user.
@@ -27,11 +26,10 @@ def inbox(request, template_name='django_messages/inbox.html'):
         ``template_name``: name of the template to use.
     """
     message_list = Message.objects.inbox_for(request.user)
-    return render(request, template_name, {
-        'message_list': message_list,
-    })
+    return Response(MessageSerializer(message_list, many=True).data)
 
 @login_required
+@api_view(['GET'])
 def outbox(request, template_name='django_messages/outbox.html'):
     """
     Displays a list of sent messages by the current user.
@@ -39,11 +37,10 @@ def outbox(request, template_name='django_messages/outbox.html'):
         ``template_name``: name of the template to use.
     """
     message_list = Message.objects.outbox_for(request.user)
-    return render(request, template_name, {
-        'message_list': message_list,
-    })
+    return Response(MessageSerializer(message_list, many=True).data)
 
 @login_required
+@api_view(['GET'])
 def trash(request, template_name='django_messages/trash.html'):
     """
     Displays a list of deleted messages.
@@ -53,12 +50,10 @@ def trash(request, template_name='django_messages/trash.html'):
     by sender and recipient.
     """
     message_list = Message.objects.trash_for(request.user)
-    return render(request, template_name, {
-        'message_list': message_list,
-    })
+    return Response(MessageSerializer(message_list, many=True).data)
 
 @login_required
-def compose(request, recipient=None, form_class=ComposeForm,
+def compose(request, recipient=None,
         template_name='django_messages/compose.html', success_url=None, recipient_filter=None):
     """
     Displays and handles the ``form_class`` form to compose new messages.
@@ -92,7 +87,7 @@ def compose(request, recipient=None, form_class=ComposeForm,
     })
 
 @login_required
-def reply(request, message_id, form_class=ComposeForm,
+def reply(request, message_id,
         template_name='django_messages/compose.html', success_url=None,
         recipient_filter=None, quote_helper=format_quote,
         subject_template=_(u"Re: %(subject)s"),):
@@ -126,98 +121,3 @@ def reply(request, message_id, form_class=ComposeForm,
     return render(request, template_name, {
         'form': form,
     })
-
-@login_required
-def delete(request, message_id, success_url=None):
-    """
-    Marks a message as deleted by sender or recipient. The message is not
-    really removed from the database, because two users must delete a message
-    before it's save to remove it completely.
-    A cron-job should prune the database and remove old messages which are
-    deleted by both users.
-    As a side effect, this makes it easy to implement a trash with undelete.
-
-    You can pass ?next=/foo/bar/ via the url to redirect the user to a different
-    page (e.g. `/foo/bar/`) than ``success_url`` after deletion of the message.
-    """
-    user = request.user
-    now = timezone.now()
-    message = get_object_or_404(Message, id=message_id)
-    deleted = False
-    if success_url is None:
-        success_url = reverse('messages_inbox')
-    if 'next' in request.GET:
-        success_url = request.GET['next']
-    if message.sender == user:
-        message.sender_deleted_at = now
-        deleted = True
-    if message.recipient == user:
-        message.recipient_deleted_at = now
-        deleted = True
-    if deleted:
-        message.save()
-        messages.info(request, _(u"Message successfully deleted."))
-        if notification:
-            notification.send([user], "messages_deleted", {'message': message,})
-        return HttpResponseRedirect(success_url)
-    raise Http404
-
-@login_required
-def undelete(request, message_id, success_url=None):
-    """
-    Recovers a message from trash. This is achieved by removing the
-    ``(sender|recipient)_deleted_at`` from the model.
-    """
-    user = request.user
-    message = get_object_or_404(Message, id=message_id)
-    undeleted = False
-    if success_url is None:
-        success_url = reverse('messages_inbox')
-    if 'next' in request.GET:
-        success_url = request.GET['next']
-    if message.sender == user:
-        message.sender_deleted_at = None
-        undeleted = True
-    if message.recipient == user:
-        message.recipient_deleted_at = None
-        undeleted = True
-    if undeleted:
-        message.save()
-        messages.info(request, _(u"Message successfully recovered."))
-        if notification:
-            notification.send([user], "messages_recovered", {'message': message,})
-        return HttpResponseRedirect(success_url)
-    raise Http404
-
-@login_required
-def view(request, message_id, form_class=ComposeForm, quote_helper=format_quote,
-        subject_template=_(u"Re: %(subject)s"),
-        template_name='django_messages/view.html'):
-    """
-    Shows a single message.``message_id`` argument is required.
-    The user is only allowed to see the message, if he is either
-    the sender or the recipient. If the user is not allowed a 404
-    is raised.
-    If the user is the recipient and the message is unread
-    ``read_at`` is set to the current datetime.
-    If the user is the recipient a reply form will be added to the
-    tenplate context, otherwise 'reply_form' will be None.
-    """
-    user = request.user
-    now = timezone.now()
-    message = get_object_or_404(Message, id=message_id)
-    if (message.sender != user) and (message.recipient != user):
-        raise Http404
-    if message.read_at is None and message.recipient == user:
-        message.read_at = now
-        message.save()
-
-    context = {'message': message, 'reply_form': None}
-    if message.recipient == user:
-        form = form_class(initial={
-            'body': quote_helper(message.sender, message.body),
-            'subject': subject_template % {'subject': message.subject},
-            'recipient': [message.sender,]
-            })
-        context['reply_form'] = form
-    return render(request, template_name, context)

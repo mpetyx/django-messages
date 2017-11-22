@@ -1,24 +1,25 @@
 from distutils.core import setup
 
 setup(
-    name='django-messages',
-    version=__import__('django_messages').__version__,
-    description='User-to-user messaging system for Django',
+    name='django-rest-messages',
+    version=__import__('django_rest_messages').__version__,
+    description='User-to-user messaging API for Django',
     long_description=open('README.rst').read(),
-    author='Arne Brodowski',
-    author_email='mail@arnebrodowski.de',
-    url='https://github.com/arneb/django-messages',
+    author='Michael Petychakis',
+    author_email='hello@apilama.com',
+    url='https://github.com/mpetyx/django-rest-messages',
     install_requires=[
-        'Django'
+        'Django',
+        'djangorestframework'
     ],
     packages=(
-        'django_messages',
-        'django_messages.templatetags',
-        'django_messages.migrations',
+        'django_rest_messages',
+        'django_rest_messages.templatetags',
+        'django_rest_messages.migrations',
     ),
     package_data={
-        'django_messages': [
-            'templates/django_messages/*',
+        'django_rest_messages': [
+            'templates/django_rest_messages/*',
             'templates/notification/*/*',
             'locale/*/LC_MESSAGES/*',
         ]
